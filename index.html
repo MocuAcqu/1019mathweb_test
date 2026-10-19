@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>數學探險隊：從數線出發，解鎖數字的力量！</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- MathJax 設定與載入 -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+            startup: { typeset: false } // 關閉自動排版，由 JS 手動控制確保動態內容正確顯示
+        };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+    <!-- 頂部導覽列 -->
+    <header>
+        <div class="logo">
+            <h1>🚀 數學探險隊</h1>
+            <p>從數線出發，解鎖數字的力量！</p>
+        </div>
+        <nav>
+            <button class="nav-btn active" data-target="concept">觀念補給站</button>
+            <button class="nav-btn" data-target="lab">解題實驗室</button>
+            <button class="nav-btn" data-target="arena">挑戰競技場</button>
+        </nav>
+    </header>
+
+    <!-- 主要內容區 -->
+    <main>
+        <!-- 第一部分：觀念補給站 -->
+        <section id="concept" class="tab-content active">
+            <h2>⛺ 觀念補給站</h2>
+            <p class="section-desc">建立直覺，了解數學背後的為什麼。點擊下方卡片展開學習吧！</p>
+            
+            <div class="card">
+                <h3>1. 認識整數與數線</h3>
+                <p>數線有三個精靈：**原點 (0)**、**正方向 (向右)**、**單位長 (每一格的距離)**。</p>
+                <div class="interactive-number-line" id="number-line-container">
+                    <!-- JS 將動態生成數線 -->
+                </div>
+                <div id="nl-info" class="info-box">請點擊上方數線上的刻度！</div>
+                <p>💡 <strong>絕對值：</strong> 代表到原點的距離，例如 \([-5]\) 的絕對值是 \(|-5| = 5\)。</p>
+                <p>💡 <strong>相反數：</strong> 符號相反，距離相同，例如 \(-3\) 的相反數是 \(3\)。</p>
+            </div>
+
+            <div class="card">
+                <h3>2. 整數的四則運算</h3>
+                <div class="grid-2col">
+                    <div>
+                        <h4>加法與減法</h4>
+                        <ul>
+                            <li><strong>同號相加：</strong> 方向相同，力量變大。\( (-3) + (-2) = -5 \)</li>
+                            <li><strong>異號相加：</strong> 方向相反，互相抵消。\( (-5) + 3 = -2 \)</li>
+                            <li><strong>減去負數：</strong> 轉向再轉向，等於往前走！所以減去負數等於加上正數。\( 3 - (-4) = 3 + 4 = 7 \)</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>乘法與除法</h4>
+                        <ul>
+                            <li>同號相乘除 ➔ 結果為 <strong>正</strong></li>
+                            <li>異號相乘除 ➔ 結果為 <strong>負</strong></li>
+                            <li>⚠️ <strong>零不能當除數！</strong></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <strong>四則運算優先順序：</strong> ①括號 ➔ ②乘方 ➔ ③乘除 ➔ ④加減 (同級由左至右)
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>3. 乘方與 10 的次方</h3>
+                <p>乘方是連乘的縮寫。要注意負號有沒有被括號包起來喔！</p>
+                <ul>
+                    <li>\( (-2)^2 = (-2) \times (-2) = 4 \) (負數的平方)</li>
+                    <li>\( -2^2 = -(2 \times 2) = -4 \) (先算平方，再加負號)</li>
+                    <li>\( 10^3 = 1000 \) (正指數：原點向右大數)</li>
+                    <li>\( 10^{-2} = \frac{1}{100} = 0.01 \) (負指數：代表小數，不是負數喔！)</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>4. 科學記號</h3>
+                <p>用來表示極大或極小的數字。標準形式：\( a \times 10^n \) ，其中 \( 1 \leq a < 10 \)，\(n\) 為整數。</p>
+                <div class="grid-2col">
+                    <div class="info-box">
+                        <strong>大數字轉換</strong><br>
+                        \( 3500000 = 3.5 \times 10^6 \)<br>
+                        (小數點向左移 6 位)
+                    </div>
+                    <div class="info-box">
+                        <strong>小數轉換</strong><br>
+                        \( 0.00042 = 4.2 \times 10^{-4} \)<br>
+                        (小數點向右移 4 位)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第二部分：解題實驗室 -->
+        <section id="lab" class="tab-content">
+            <h2>🧪 解題實驗室</h2>
+            <p class="section-desc">跟著老師一步一步解開謎題，不要急，理解過程最重要！</p>
+            
+            <div class="card example-card">
+                <div class="tags"><span class="tag">混合四則運算</span></div>
+                <h3>範例題：計算 \( -3 + 2 \times (-4) \)</h3>
+                <div class="step-container" id="example-1-steps">
+                    <div class="step hidden"><strong>步驟 1：先乘除後加減。</strong> 先算 \( 2 \times (-4) \)。</div>
+                    <div class="step hidden"><strong>步驟 2：異號相乘。</strong> \( 2 \times (-4) = -8 \)。</div>
+                    <div class="step hidden"><strong>步驟 3：化簡算式。</strong> 原式變成 \( -3 + (-8) \)。</div>
+                    <div class="step hidden"><strong>步驟 4：同號相加。</strong> \( -3 + (-8) = -11 \)。</div>
+                    <div class="step hidden final-ans"><strong>最終答案：</strong> \( -11 \)</div>
+                </div>
+                <button class="btn primary-btn" id="btn-example-1" onclick="showNextStep('example-1-steps')">查看下一步</button>
+            </div>
+
+            <div class="card example-card">
+                <div class="tags"><span class="tag">科學記號運算</span></div>
+                <h3>範例題：計算 \( (2 \times 10^3) \times (3 \times 10^2) \)</h3>
+                <div class="step-container" id="example-2-steps">
+                    <div class="step hidden"><strong>思路：</strong> 乘法有交換律，把數字放一起，10的次方放一起。</div>
+                    <div class="step hidden"><strong>步驟 1：重新分組。</strong> \( (2 \times 3) \times (10^3 \times 10^2) \)。</div>
+                    <div class="step hidden"><strong>步驟 2：係數相乘。</strong> \( 2 \times 3 = 6 \)。</div>
+                    <div class="step hidden"><strong>步驟 3：同底數相乘，指數相加。</strong> \( 10^3 \times 10^2 = 10^{3+2} = 10^5 \)。</div>
+                    <div class="step hidden final-ans"><strong>最終答案：</strong> \( 6 \times 10^5 \)</div>
+                </div>
+                <button class="btn primary-btn" id="btn-example-2" onclick="showNextStep('example-2-steps')">查看下一步</button>
+            </div>
+
+            <!-- 外部學習資源區 -->
+            <h3>📚 延伸學習資源 (均一教育平台)</h3>
+            <div class="external-links-grid" id="external-links">
+                <!-- JS 動態生成 -->
+            </div>
+        </section>
+
+        <!-- 第三部分：挑戰競技場 -->
+        <section id="arena" class="tab-content">
+            <h2>⚔️ 挑戰競技場</h2>
+            
+            <div id="quiz-setup">
+                <p class="section-desc">準備好驗收成果了嗎？請選擇測驗模式！</p>
+                <div class="mode-cards">
+                    <button class="card mode-btn" onclick="startQuiz('free')">
+                        <h3>🌱 自由練習</h3>
+                        <p>無時間壓力，答錯有詳解，適合慢慢熟練。</p>
+                    </button>
+                    <button class="card mode-btn" onclick="startQuiz('timed')">
+                        <h3>⏱️ 限題挑戰</h3>
+                        <p>10題挑戰，看看你的計算速度與準確度！</p>
+                    </button>
+                    <button class="card mode-btn" onclick="startQuiz('weakness')">
+                        <h3>🩹 弱點加強</h3>
+                        <p>自動從錯題紀錄出題，打敗過去的自己！</p>
+                    </button>
+                </div>
+                <button class="btn secondary-btn" style="margin-top:20px;" onclick="clearStats()">🗑️ 清除學習與錯題紀錄</button>
+            </div>
+
+            <!-- 測驗進行中 UI -->
+            <div id="quiz-ui" class="hidden">
+                <div class="quiz-header">
+                    <span id="quiz-status" class="tag">第 1 題</span>
+                    <span id="quiz-score" class="tag hidden">分數: 0</span>
+                    <div class="sound-toggle">
+                        <label><input type="checkbox" id="sound-switch" checked> 🎵 音效與動畫</label>
+                    </div>
+                </div>
+                
+                <div class="card question-card">
+                    <h3 id="question-text">載入題目中...</h3>
+                    <div class="options-grid" id="options-container">
+                        <!-- 選項按鈕動態生成 -->
+                    </div>
+                </div>
+
+                <div id="feedback-area" class="feedback-box hidden">
+                    <h4 id="feedback-title"></h4>
+                    <p id="feedback-msg"></p>
+                    <div id="feedback-steps" class="step-container"></div>
+                </div>
+
+                <div class="quiz-actions">
+                    <button id="btn-submit" class="btn primary-btn" disabled>確認答案</button>
+                    <button id="btn-next" class="btn secondary-btn hidden">下一題 ➔</button>
+                    <button id="btn-end" class="btn hidden">結束測驗</button>
+                </div>
+            </div>
+
+            <!-- 測驗結果 UI -->
+            <div id="quiz-result" class="hidden card">
+                <h3>🎉 測驗結算</h3>
+                <div class="stats-grid">
+                    <div class="stat-box">總答題數 <strong id="res-total">0</strong></div>
+                    <div class="stat-box">答對題數 <strong id="res-correct" class="text-success">0</strong></div>
+                    <div class="stat-box">答錯題數 <strong id="res-wrong" class="text-error">0</strong></div>
+                    <div class="stat-box">答對率 <strong id="res-rate">0%</strong></div>
+                </div>
+                <p id="res-encouragement" class="highlight-box"></p>
+                <div class="quiz-actions">
+                    <button class="btn primary-btn" onclick="resetArena()">再挑戰一次</button>
+                    <button class="btn secondary-btn" onclick="document.querySelector('.nav-btn[data-target=\'concept\']').click()">返回觀念補給站</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 花瓣雨容器 -->
+    <div id="petal-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

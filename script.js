@@ -31,6 +31,11 @@ document.addEventListener('DOMContentLoaded', () => {
     renderNumberLine();
     renderExternalLinks();
     loadStats();
+
+    // 【修復】將測驗按鈕的事件監聽器綁定移入此處，確保 DOM 元素已確實抓取到
+    DOM.btnSubmit.addEventListener('click', submitAnswer);
+    DOM.btnNext.addEventListener('click', nextQuestion);
+    DOM.btnEnd.addEventListener('click', endQuiz);
 });
 
 // ==========================================
@@ -103,7 +108,8 @@ function renderNumberLine() {
 // ==========================================
 function renderExternalLinks() {
     const links = [
-        { title: '整數的四則運算', platform: '均一教育平台', desc: '複習整數的四則運算與正負數運算規則。', url: 'https://www.junyiacademy.org/root/math/m-7/m-7a/m-7a-01' },
+        // 【修復】更新為均一平台最新的國一數學第一章（整數與數線）總覽連結
+        { title: '整數的四則運算', platform: '均一教育平台', desc: '複習整數的四則運算與正負數運算規則。', url: 'https://www.junyiacademy.org/course-compare/math-junior/j-m7a/j-m7a-ch1' },
         { title: '科學記號與指數', platform: '均一教育平台', desc: '學習 10 的次方、科學記號表示法及相關題型。', url: 'https://www.junyiacademy.org/video/05KM9ySj7Xg' },
         { title: '科學記號的引入', platform: '均一教育平台', desc: '從觀念建立開始理解科學記號。', url: 'https://www.junyiacademy.org/video/zMKwg3ZoWLk' }
     ];
@@ -144,7 +150,7 @@ function shuffle(array) {
 
 // Web Audio API 歡欣音效
 function playSuccessSound() {
-    if (!DOM.soundSwitch.checked) return;
+    if (!DOM.soundSwitch || !DOM.soundSwitch.checked) return;
     try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
         const osc = ctx.createOscillator();
@@ -164,13 +170,13 @@ function playSuccessSound() {
         osc.start(ctx.currentTime);
         osc.stop(ctx.currentTime + 0.6);
     } catch (e) {
-        console.warn("瀏覽器不支援 Web Audio API 或需要使用者先互動", e);
+        console.warn("音效播放需要使用者先互動", e);
     }
 }
 
 // 花瓣雨動畫
 function spawnPetals() {
-    if (!DOM.soundSwitch.checked) return;
+    if (!DOM.soundSwitch || !DOM.soundSwitch.checked) return;
     const container = document.getElementById('petal-container');
     const colors = ['#FFB7B2', '#FFDAC1', '#E2F0CB', '#B5EAD7', '#C7CEEA'];
     
@@ -179,7 +185,6 @@ function spawnPetals() {
         petal.className = 'petal';
         petal.style.left = Math.random() * 100 + 'vw';
         petal.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        // 隨機大小與動畫時間
         const size = Math.random() * 10 + 10;
         petal.style.width = size + 'px';
         petal.style.height = size + 'px';
@@ -188,7 +193,6 @@ function spawnPetals() {
         
         container.appendChild(petal);
         
-        // 動畫結束後自動移除
         setTimeout(() => {
             if(container.contains(petal)) container.removeChild(petal);
         }, 5000);
@@ -199,11 +203,9 @@ function spawnPetals() {
 // 6. 隨機題目生成引擎
 // ==========================================
 const QuestionGenerators = {
-    // 加減法
     addSub() {
         let a = randInt(-15, 15);
         let b = randInt(-15, 15);
-        // 避免產生 0
         if(a===0) a = -3; 
         if(b===0) b = 5;
         
@@ -223,7 +225,6 @@ const QuestionGenerators = {
             
         return { type: '整數加減法', text, correct, options, steps };
     },
-    // 乘除法
     mulDiv() {
         const isMul = Math.random() > 0.5;
         let a = randInt(-9, 9) || -2;
@@ -235,26 +236,20 @@ const QuestionGenerators = {
             text = `\\( (${a}) \\times (${b}) \\)`;
             steps = [`算式：\\( (${a}) \\times (${b}) \\)`, `判斷正負號：${(a>0 && b>0) || (a<0 && b<0) ? '同號相乘為正。' : '異號相乘為負。'}`, `計算數值：\\( ${Math.abs(a)} \\times ${Math.abs(b)} = ${Math.abs(correct)} \\)`, `結果：\\( ${correct} \\)`];
         } else {
-            // 確保能整除
             correct = a;
             let dividend = a * b;
-            if(b===0) b=2; // 除數不可為0
+            if(b===0) b=2; 
             text = `\\( (${dividend}) \\div (${b}) \\)`;
             steps = [`算式：\\( (${dividend}) \\div (${b}) \\)`, `判斷正負號：${(dividend>0 && b>0) || (dividend<0 && b<0) ? '同號相除為正。' : '異號相除為負。'}`, `計算數值：\\( ${Math.abs(dividend)} \\div ${Math.abs(b)} = ${Math.abs(correct)} \\)`, `結果：\\( ${correct} \\)`];
         }
         
-        const distractors = [
-            -correct, correct + b, correct - a, a+b
-        ].filter(v => v !== correct && v !== undefined);
-        // 確保選項不重複
+        const distractors = [ -correct, correct + b, correct - a, a+b ].filter(v => v !== correct && v !== undefined);
         let options = Array.from(new Set([correct, ...distractors])).slice(0,4);
         while(options.length < 4) { options.push(options[0] + randInt(1,5)); options = Array.from(new Set(options));}
         
         return { type: '整數乘除法', text, correct, options: shuffle(options), steps };
     },
-    // 四則運算
     mixed() {
-        // a + b * c
         let a = randInt(-10, 10) || 1;
         let b = randInt(-5, 5) || -2;
         let c = randInt(-5, 5) || 3;
@@ -262,7 +257,6 @@ const QuestionGenerators = {
         const correct = a + (b * c);
         const text = `\\( ${a} + (${b}) \\times (${c}) \\)`;
         
-        // 常見錯誤：先加後乘 (a+b)*c
         const wrong1 = (a + b) * c;
         const wrong2 = a - (b * c);
         const wrong3 = correct + randInt(1, 4);
@@ -280,7 +274,6 @@ const QuestionGenerators = {
         
         return { type: '混合四則運算', text, correct, options: shuffle(options), steps };
     },
-    // 乘方
     exponents() {
         let base = randInt(2, 4);
         let exp = randInt(2, 3);
@@ -291,7 +284,6 @@ const QuestionGenerators = {
         
         if(isNegativeBase) {
             if(hasParenthesis) {
-                // (-a)^b
                 correct = Math.pow(-base, exp);
                 text = `\\( (-${base})^${exp} \\)`;
                 steps = [
@@ -301,7 +293,6 @@ const QuestionGenerators = {
                     `結果：\\( ${correct} \\)`
                 ];
             } else {
-                // -a^b
                 correct = -Math.pow(base, exp);
                 text = `\\( -${base}^${exp} \\)`;
                 steps = [
@@ -322,9 +313,8 @@ const QuestionGenerators = {
         
         return { type: '乘方判斷', text, correct, options: shuffle(options.slice(0,4)), steps };
     },
-    // 科學記號 (轉標準形)
     scientific() {
-        let coef = randInt(11, 99) / 10; // 1.1 ~ 9.9
+        let coef = randInt(11, 99) / 10; 
         let exp = randInt(3, 6);
         let standard = `${coef} \\times 10^{${exp}}`;
         let largeNum = coef * Math.pow(10, exp);
@@ -352,7 +342,6 @@ function getRandomQuestion(preferredType = null) {
     const types = Object.keys(QuestionGenerators);
     let selectedType = types[Math.floor(Math.random() * types.length)];
     
-    // 弱點加強機制：增加特定題型出現機率
     if (preferredType && QuestionGenerators[preferredType] && Math.random() < 0.7) {
         selectedType = preferredType;
     }
@@ -373,21 +362,21 @@ window.startQuiz = function(mode) {
     document.getElementById('quiz-ui').classList.remove('hidden');
     document.getElementById('quiz-score').classList.toggle('hidden', mode === 'free');
     
-    DOM.btnSubmit.disabled = true;
-    DOM.btnSubmit.classList.remove('hidden');
-    DOM.btnNext.classList.add('hidden');
-    DOM.btnEnd.classList.remove('hidden');
+    if(DOM.btnSubmit) {
+        DOM.btnSubmit.disabled = true;
+        DOM.btnSubmit.classList.remove('hidden');
+    }
+    if(DOM.btnNext) DOM.btnNext.classList.add('hidden');
+    if(DOM.btnEnd) DOM.btnEnd.classList.remove('hidden');
     
     loadQuestion();
 };
 
 function loadQuestion() {
-    // 弱點提取邏輯
     let targetType = null;
     if (state.mode === 'weakness') {
         const types = Object.keys(state.stats.wrongTypes);
         if(types.length > 0) {
-            // 找出錯誤最多次的題型
             targetType = types.reduce((a, b) => state.stats.wrongTypes[a] > state.stats.wrongTypes[b] ? a : b);
         }
     }
@@ -396,7 +385,6 @@ function loadQuestion() {
     state.selectedOptionIndex = -1;
     state.questionCount++;
     
-    // 更新 UI
     document.getElementById('quiz-status').innerText = state.mode === 'timed' ? `第 ${state.questionCount} / ${state.maxQuestions} 題` : `第 ${state.questionCount} 題`;
     document.getElementById('quiz-score').innerText = `分數: ${state.score}`;
     document.getElementById('question-text').innerHTML = `
@@ -404,12 +392,10 @@ function loadQuestion() {
         ${state.currentQuestion.text}
     `;
     
-    // 隱藏回饋區
     const feedbackArea = document.getElementById('feedback-area');
     feedbackArea.classList.add('hidden');
     feedbackArea.classList.remove('success', 'error');
     
-    // 渲染選項
     const optionsContainer = document.getElementById('options-container');
     optionsContainer.innerHTML = '';
     state.currentQuestion.options.forEach((opt, index) => {
@@ -435,7 +421,8 @@ function selectOption(index) {
     DOM.btnSubmit.disabled = false;
 }
 
-DOM.btnSubmit.addEventListener('click', () => {
+// 【修復】測驗相關事件函式實作
+function submitAnswer() {
     if (state.selectedOptionIndex === -1) return;
     
     const selectedAns = state.currentQuestion.options[state.selectedOptionIndex];
@@ -469,7 +456,7 @@ DOM.btnSubmit.addEventListener('click', () => {
         playSuccessSound();
         spawnPetals();
         
-        // 降低錯題權重 (弱點模式)
+        // 降低錯題權重
         if(state.stats.wrongTypes[state.currentQuestion.type]) {
             state.stats.wrongTypes[state.currentQuestion.type]--;
         }
@@ -501,17 +488,15 @@ DOM.btnSubmit.addEventListener('click', () => {
     feedbackArea.classList.remove('hidden');
     saveStats();
     updateMathJax();
-});
+}
 
-DOM.btnNext.addEventListener('click', () => {
+function nextQuestion() {
     if (state.mode === 'timed' && state.questionCount >= state.maxQuestions) {
         endQuiz();
     } else {
         loadQuestion();
     }
-});
-
-DOM.btnEnd.addEventListener('click', endQuiz);
+}
 
 function endQuiz() {
     document.getElementById('quiz-ui').classList.add('hidden');
